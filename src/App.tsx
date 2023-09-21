@@ -1,39 +1,86 @@
 import React from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  useColorScheme,
-  View,
-} from 'react-native';
+import {StyleSheet, View} from 'react-native';
+import {Appbar, Text, Button} from 'react-native-paper';
 
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {Pokemon} from './Pokemon';
+import {useApp} from './App.hook';
+import {Modal} from './Modal';
 
 function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const {
+    usersPokemon,
+    opponentsPokemon,
+    usersHit,
+    opponentsHit,
+    onButtonPress,
+    visible,
+    hideModal,
+    onContinuePress,
+    onReceivePress,
+  } = useApp();
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
+    <View style={styles.base}>
+      <Appbar.Header>
+        <Appbar.Content title="Pokemon battle" />
+      </Appbar.Header>
+      <View style={styles.battleField}>
+        <Pokemon data={usersPokemon} role="user" style={styles.usersPokemon} />
+        <Pokemon
+          data={opponentsPokemon}
+          role="opponent"
+          style={styles.opponentsPokemon}
+        />
+      </View>
+      <View style={styles.bottomInfo}>
+        <Text variant="titleMedium">{`You hit for ${usersHit}`}</Text>
+        <Text variant="titleMedium">{`Your opponent hit for ${opponentsHit}`}</Text>
+        <Button mode="contained" onPress={onButtonPress} style={styles.button}>
+          Attack
+        </Button>
+      </View>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        wins={usersPokemon.wins}
+        losses={usersPokemon.losses}
+        isWin={opponentsPokemon.health === 0}
+        onContinuePress={onContinuePress}
+        onReceivePress={onReceivePress}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <View />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  base: {
+    minHeight: '100%',
+  },
+  usersPokemon: {
+    alignSelf: 'flex-start',
+  },
+  opponentsPokemon: {
+    alignSelf: 'flex-end',
+  },
+  battleField: {
+    marginHorizontal: 10,
+    marginTop: '10%',
+  },
+  bottomInfo: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 30,
+  },
+  button: {
+    marginTop: 10,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    marginHorizontal: 20,
+    borderRadius: 20,
+  },
+});
 
 export default App;
